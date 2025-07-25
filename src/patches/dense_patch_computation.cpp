@@ -328,6 +328,7 @@ bool merge_patches(
     }
 
     auto routing_region = router.find_routing_ancilla(slice, source, source_op, target, target_op);
+
     if(!routing_region)
     {
         return false;
@@ -337,7 +338,12 @@ bool merge_patches(
         routing_region->routing_region_id = multi_body_measurement_op_id_counter++;
 
     // TODO check that the path is actually free when caching
-
+    std::cout << "Path: [";
+    for(auto elem : (*routing_region).cells){
+            std::cout << elem.cell << " ";
+    }
+    std::cout << "]" << std::endl;
+    std::cout << "Path length: " << routing_region->cells.size() << std::endl;
     stitch_boundaries(slice, *slice.get_cell_by_id(source), *slice.get_cell_by_id(target), *routing_region);
     mark_routing_region(slice, *routing_region, PatchActivity::MultiPatchMeasurement);
 
@@ -1540,8 +1546,7 @@ void run_through_dense_slices_streamed(
             slice_visitor(slice);
             advance_slice(slice, layout);
             res.slice_count_++;
-
-            for (auto&& i: application_result.followup_instructions)
+             for (auto&& i: application_result.followup_instructions)
                 future_instructions.push_back(i);
         }
         else if (application_result.maybe_error)
@@ -1675,7 +1680,7 @@ void run_through_dense_slices_wave(
         
         slice_visitor(slice);
         advance_slice(slice, layout);
-        
+        std::cout << "slice: " << res.slice_count_ << std::endl;
         res.slice_count_++;
     }
 }
